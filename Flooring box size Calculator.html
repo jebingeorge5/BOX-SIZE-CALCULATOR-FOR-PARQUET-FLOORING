@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Flooring Calculator</title>
+    <style>
+        body { font-family: Arial; margin: 40px; }
+        input, select { padding: 8px; margin: 5px; }
+        button { padding: 10px 20px; background: #007bff; color: white; border: none; cursor: pointer; }
+        #results { background: #f5f5f5; padding: 15px; margin-top: 20px; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+<h2>🏠 Daily Flooring Calculator</h2>
+
+<label>Area (SQM):</label><br>
+<input type="number" id="area" step="0.01" placeholder="Enter area"><br><br>
+
+<label>Flooring Type:</label><br>
+<select id="type" onchange="toggleCustom()">
+    <option value="2.208">Spinifex (2.208 SQM)</option>
+    <option value="2.07">Desert Oak (2.07 SQM)</option>
+    <option value="1.756">Linden (1.756 SQM)</option>
+    <option value="0.819-herringbone">Herringbone (0.819 SQM)</option>
+    <option value="custom">Custom Size</option>
+</select><br><br>
+
+<div id="customSize" style="display:none;">
+    <label>Custom Box Size:</label><br>
+    <input type="number" id="customSizeInput" step="0.001" placeholder="Enter box size"><br><br>
+</div>
+
+<button onclick="calculate()">Calculate</button>
+<button onclick="resetForm()">Reset</button>
+
+<div id="results"></div>
+
+<script>
+function toggleCustom() {
+    const customDiv = document.getElementById('customSize');
+    const type = document.getElementById('type').value;
+    customDiv.style.display = (type === 'custom') ? 'block' : 'none';
+}
+
+function calculate() {
+
+    const area = parseFloat(document.getElementById('area').value);
+    if (!area || area <= 0) {
+        alert("Please enter a valid area!");
+        return;
+    }
+
+    const type = document.getElementById('type').value;
+    let boxSize;
+    let wastePercent = 0.10; // default 10%
+
+    if (type === 'custom') {
+
+        boxSize = parseFloat(document.getElementById('customSizeInput').value);
+        if (!boxSize || boxSize <= 0) {
+            alert("Please enter a valid custom box size!");
+            return;
+        }
+
+    } else if (type === '0.819-herringbone') {
+
+        boxSize = 0.819;
+        wastePercent = 0.16; // 16% for herringbone
+
+    } else {
+
+        boxSize = parseFloat(type);
+    }
+
+    // Calculations
+    const wastage = area * wastePercent;
+    const totalArea = area + wastage;
+    const boxQuantity = Math.ceil(totalArea / boxSize);
+    const productSQM = boxQuantity * boxSize;
+
+    // Display results
+    document.getElementById('results').innerHTML = `
+        <h3>📊 Results:</h3>
+        <p><strong>Area Entered:</strong> ${area.toFixed(2)} SQM</p>
+        <p><strong>Wastage (${wastePercent * 100}%):</strong> ${wastage.toFixed(2)} SQM</p>
+        <p><strong>Total Area Needed:</strong> ${totalArea.toFixed(2)} SQM</p>
+        <p><strong>Box Size:</strong> ${boxSize} SQM</p>
+        <p><strong>📦 Boxes Needed:</strong> 
+            <span style="color:red;font-size:1.2em;">${boxQuantity}</span>
+        </p>
+        <p><strong>Total Product:</strong> ${productSQM.toFixed(3)} SQM</p>
+    `;
+}
+
+function resetForm() {
+    document.getElementById('area').value = '';
+    document.getElementById('type').value = '2.208';
+    document.getElementById('customSizeInput').value = '';
+    document.getElementById('customSize').style.display = 'none';
+    document.getElementById('results').innerHTML = '';
+}
+</script>
+
+</body>
+</html>
